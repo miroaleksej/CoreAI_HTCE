@@ -14,23 +14,30 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   verify:
     name: Verify HTCE-Origin v1.0
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
-      - name: Show Python version
-        run: python --version
+      - name: Show environment
+        run: |
+          python --version
+          python -m pip --version
+          pwd
+          ls -la
 
       - name: Install package
         run: |
@@ -48,6 +55,14 @@ jobs:
 
       - name: Run v1 clean system revalidation
         run: python scripts/run_v1_clean_system_revalidation.py
+
+      - name: Verify protected trace if script exists
+        run: |
+          if [ -f scripts/verify_trace.py ]; then
+            python scripts/verify_trace.py
+          else
+            echo "scripts/verify_trace.py not found; skipping trace standalone check"
+          fi
 
       - name: Verify release manifest
         run: python scripts/verify_manifest.py
