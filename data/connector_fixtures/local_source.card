@@ -1,0 +1,13 @@
+TITLE: Source-aware research memory local evidence
+AUTHORS: HTCE Fixture
+YEAR: 2026
+TYPE: dataset_card
+VENUE: local-fixture
+EVIDENCE: dataset_card
+CITATIONS: 0
+REPLICATION: 7000
+RELEVANCE: 9300
+CLAIM: external source is evidence card not truth.
+CLAIM: claim-level grounding improves theory revision by separating support, refute, limitation and uncertain evidence.
+METHOD: local batch ingestion into source-aware evidence graph.
+LIMITATION: fixture evidence is not independent peer review.
