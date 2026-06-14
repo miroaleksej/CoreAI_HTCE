@@ -1,0 +1,152 @@
+{
+  "decision_metric_contract": "runtime decisions use raw integer scores; basis-point metrics are report/render only",
+  "invariants": [
+    {
+      "check_type": "runtime_stress",
+      "checker": "check_i1",
+      "description": "All L1/L2/L3 and world-model phase coordinates must stay inside the Q256 residue class.",
+      "formula": "forall x in runtime_state: 0 <= x < N, N = 2^256",
+      "id": "I1",
+      "name": "Q256_Bounded_Phases",
+      "target_module": "htce_origin.kernel.q16"
+    },
+    {
+      "check_type": "runtime_exception",
+      "checker": "check_i2",
+      "description": "Protected serialization rejects floats so no float value can enter trace/export evidence.",
+      "formula": "exists float(p) => canonical_json_bytes(p) raises SerializationError",
+      "id": "I2",
+      "name": "No_Float_In_Protected_Serialization",
+      "target_module": "htce_origin.kernel.serialization"
+    },
+    {
+      "check_type": "ast_and_runtime",
+      "checker": "check_i3",
+      "description": "L1 sensory observations may mutate only the L1 surface and may not create L2/L3 facts.",
+      "formula": "L1_observation(o) => Delta(L1) and not Delta(L2) and not Delta(L3)",
+      "id": "I3",
+      "name": "L1_Updates_L1_Only",
+      "target_module": "htce_origin.body.runtime"
+    },
+    {
+      "check_type": "ast_analysis",
+      "checker": "check_i4",
+      "description": "No L1 observation path can call fact commit, L2 fact commit, or L3 semantic commit authority.",
+      "formula": "L1 path not -> memory.commit and not -> body.commit_l2_fact and not -> commit_l3_semantic_state",
+      "id": "I4",
+      "name": "L1_Cannot_Commit_Facts",
+      "target_module": "htce_origin.body.runtime"
+    },
+    {
+      "check_type": "runtime_assertion",
+      "checker": "check_i5",
+      "description": "Separated L2 working memory must expose clean active semantics by subtracting the accumulated episode tag mass.",
+      "formula": "L2_clean = L2_raw - tag_accumulator mod N",
+      "id": "I5",
+      "name": "Separated_L2_Clean_State",
+      "target_module": "htce_origin.body.layers"
+    },
+    {
+      "check_type": "runtime_assertion",
+      "checker": "check_i6",
+      "description": "Same-key supersession must replace the previous active residual instead of accumulating lifetime phase mass.",
+      "formula": "commit(k,v2) after commit(k,v1) => active_L2 = residual(v2), record(v1)=SUPERSEDED",
+      "id": "I6",
+      "name": "L2_Same_Key_Supersession_Reverses_Residual",
+      "target_module": "htce_origin.body.layers, htce_origin.body.memory"
+    },
+    {
+      "check_type": "ast_analysis",
+      "checker": "check_i7",
+      "description": "L3 semantic state can contribute candidates only; answer authority remains proof/policy/evidence gated.",
+      "formula": "L3_state not -> external_answer and L3_state not -> real_action",
+      "id": "I7",
+      "name": "L3_Cannot_Authorize_Alone",
+      "target_module": "htce_origin.cognition.learning, htce_origin.body.runtime"
+    },
+    {
+      "check_type": "ast_analysis",
+      "checker": "check_i8",
+      "description": "Q256 world model predicts transitions and errors only; it cannot commit facts to memory.",
+      "formula": "WorldModel not -> memory.commit and not -> body.commit_l2_fact and not -> trace-authorized fact",
+      "id": "I8",
+      "name": "World_Model_No_Fact_Commit",
+      "target_module": "htce_origin.cognition.world"
+    },
+    {
+      "check_type": "runtime_assertion",
+      "checker": "check_i9",
+      "description": "Planner and habitat gate must hard-block every real-world action path in this release.",
+      "formula": "SimulationHabitatPolicy.allowed_real_action(real) == False",
+      "id": "I9",
+      "name": "Planner_Blocks_Real_Actions",
+      "target_module": "htce_origin.control.planner"
+    },
+    {
+      "check_type": "ast_and_runtime",
+      "checker": "check_i10",
+      "description": "Every external answer must pass theorem authorization and policy evaluation with evidence linkage.",
+      "formula": "Answer => ProofGate and PolicyGate and Evidence-linked result",
+      "id": "I10",
+      "name": "Answer_Requires_Proof_Policy_Evidence",
+      "target_module": "htce_origin.body.runtime"
+    },
+    {
+      "check_type": "runtime_assertion",
+      "checker": "check_i11",
+      "description": "Runtime transitions must leave tamper-evident protected trace evidence.",
+      "formula": "forall runtime_transition: trace_len_after > trace_len_before",
+      "id": "I11",
+      "name": "Transitions_Append_Protected_Trace",
+      "target_module": "htce_origin.body.runtime"
+    },
+    {
+      "check_type": "runtime_assertion",
+      "checker": "check_i12",
+      "description": "Export/restore must preserve protected trace hash-chain verifiability.",
+      "formula": "verify_trace(restore(export(S))) == True",
+      "id": "I12",
+      "name": "Export_Restore_Preserves_Hash_Chain",
+      "target_module": "htce_origin.body.runtime"
+    },
+    {
+      "check_type": "ast_and_runtime",
+      "checker": "check_i13",
+      "description": "World and closed-loop action selection must use raw integer scores, never basis-point report metrics.",
+      "formula": "action_selection = argmin(EFE_raw); BP metrics are render-only",
+      "id": "I13",
+      "name": "No_Normalized_Decision_Core",
+      "target_module": "htce_origin.cognition.world, htce_origin.body.runtime"
+    },
+    {
+      "check_type": "runtime_assertion",
+      "checker": "check_i14",
+      "description": "The protected runtime default modulus must remain Q256, not legacy Q16.",
+      "formula": "DEFAULT_MODULUS == 2^256 and RuntimeConfig.modulus == 2^256",
+      "id": "I14",
+      "name": "Q256_Default_Modulus",
+      "target_module": "htce_origin.kernel.q16, htce_origin.kernel.config"
+    },
+    {
+      "check_type": "ast_and_runtime",
+      "checker": "check_i15",
+      "description": "L3 candidate-rule promotion may store only provisional semantic rules and must never grant direct answer, fact-commit, or real-action authority.",
+      "formula": "L3RuleCandidate -> ProvisionalRule only; not Answer and not L2Fact and not RealAction",
+      "id": "I15",
+      "name": "L3_Rule_Promotion_No_Authority_Leak",
+      "target_module": "htce_origin.cognition.l3_promotion, htce_origin.body.runtime"
+    },
+    {
+      "check_type": "runtime_and_static_claim_boundary",
+      "checker": "check_i16",
+      "description": "Hardware claims must be limited to explicit uint256 arithmetic-model verification, with no FPGA/ASIC board-measurement claim.",
+      "formula": "P19 => hardware_claim_status = arithmetic_model_verified and board_measurement_status = not_board_measured",
+      "id": "I16",
+      "name": "Hardware_Claim_Arithmetic_Model_Only",
+      "target_module": "htce_origin.kernel.uint256"
+    }
+  ],
+  "modulus": "2^256",
+  "release_line": "0.1.0-p19-hardware-width-verification-q256-final_math",
+  "schema_version": "htce-invariants-v1"
+}
