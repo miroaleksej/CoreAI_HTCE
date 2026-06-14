@@ -45,19 +45,22 @@ jobs:
           python -m pip install -e .
 
       - name: Compile HTCE package
-        run: python -m compileall htce_origin
+        run: python -m compileall htce_origin scripts tests
 
       - name: Scan for forbidden float literals
-        run: python scripts/scan_float_literals.py
+        run: python scripts/00_gates/scan_float_literals.py
+
+      - name: Check version sync
+        run: python scripts/00_gates/check_version_sync.py
 
       - name: Check mathematical invariants
-        run: python scripts/check_invariants.py
+        run: python scripts/00_gates/check_invariants.py
 
       - name: Run v1 clean system revalidation
-        run: python scripts/run_v1_clean_system_revalidation.py
+        run: python -c "from htce_origin import HTCERuntime; rt=HTCERuntime(); rt.wake(); r=rt.run_v1_clean_system_revalidation(stress_steps=8, grid_size=5).as_payload(); assert r['passed'] is True; print('v1_clean_system_revalidation: PASS')"
 
-      - name: Verify protected trace if script exists
-        run: |
+      - name: Verify release manifest
+        run: python scripts/05_artifacts/verify_manifest.py
           if [ -f scripts/verify_trace.py ]; then
             python scripts/verify_trace.py
           else
