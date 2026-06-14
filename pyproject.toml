@@ -1,6 +1,6 @@
 [project]
 name = "htce-origin-clean-body"
-version = "1.0.0-final_math-q256-clean"
+version = "1.0.0+final.math.q256.clean"
 description = "HTCE-Origin v1.0 clean Q256 toroidal cognitive runtime with unified living/dialog/adaptive/multitask simulation and verified release gates."
 requires-python = ">=3.10"
 dependencies = []
