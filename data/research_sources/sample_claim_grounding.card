@@ -1,0 +1,8 @@
+TITLE: Claim-Level Grounding Reference Card
+TYPE: peer_reviewed
+YEAR: 2026
+EVIDENCE: method_paper
+CITATIONS: 10
+CLAIM: claim-level verification separates support refute and uncertain evidence.
+LIMITATION: paper-level topical similarity is insufficient for theory update.
+METHOD: source-card parser sample

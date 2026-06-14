@@ -1,0 +1,13 @@
+TITLE: Retrieval-Augmented Generation Robustness Survey
+AUTHORS: Sharma
+YEAR: 2025
+TYPE: arxiv
+VENUE: arXiv
+EVIDENCE: method_paper
+CITATIONS: 12
+REPLICATION: 6400
+RELEVANCE: 9300
+CLAIM: Retrieval-augmented generation reduces dependence on parametric memory by conditioning generation on external evidence.
+CLAIM: RAG introduces challenges in retrieval quality, grounding fidelity, efficiency, and noisy or adversarial inputs.
+METHOD: Survey taxonomy over retriever-centric, generator-centric, hybrid and robustness-oriented systems.
+LIMITATION: RAG faithfulness depends on retrieved evidence quality and pipeline coordination.
