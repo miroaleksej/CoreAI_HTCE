@@ -1,5 +1,53 @@
-python -m compileall htce_origin
-python scripts/scan_float_literals.py
-python scripts/check_invariants.py
-python scripts/run_v1_clean_system_revalidation.py
-python scripts/verify_manifest.py
+name: HTCE-Origin CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify HTCE-Origin v1.0
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Show Python version
+        run: python --version
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Compile HTCE package
+        run: python -m compileall htce_origin
+
+      - name: Scan for forbidden float literals
+        run: python scripts/scan_float_literals.py
+
+      - name: Check mathematical invariants
+        run: python scripts/check_invariants.py
+
+      - name: Run v1 clean system revalidation
+        run: python scripts/run_v1_clean_system_revalidation.py
+
+      - name: Verify release manifest
+        run: python scripts/verify_manifest.py
