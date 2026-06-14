@@ -19,7 +19,7 @@ def _float_constant_count(path: Path) -> int:
 
 
 def test_p12_version_and_q256_world_default():
-    assert __version__.startswith("1.0.0-")
+    assert __version__.startswith("1.0.0+")
     model = Q256WorldModel(dimension=2)
     assert model.modulus == Q256_MODULUS
     assert Q16WorldModel is Q256WorldModel
@@ -50,7 +50,7 @@ def test_no_float_literals_in_htce_origin():
 
 def test_capability_matrix_is_machine_readable_q256():
     payload = json.loads((ROOT / "capabilities.json").read_text(encoding="utf-8"))
-    assert payload["version"].startswith("1.0.0-")
+    assert payload["version"].startswith("1.0.0+")
     assert payload["release_line"] == "v1.0_final_math_q256_clean"
     assert payload["modulus"] == "2^256"
     assert payload["integer_only_runtime"] is True
