@@ -9,3 +9,19 @@ dependencies = []
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["htce_origin", "htce_origin.*"]
+exclude = [
+    "data",
+    "data.*",
+    "docs",
+    "docs.*",
+    "scripts",
+    "scripts.*",
+    "tests",
+    "tests.*",
+    "artifacts",
+    "artifacts.*"
+]
