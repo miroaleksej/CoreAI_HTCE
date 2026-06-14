@@ -1,3 +1,4 @@
+<img width="1447" height="1087" alt="9a2927df-694b-4fe9-af63-c317eefe3039" src="https://github.com/user-attachments/assets/e8d3c161-6366-4b01-9548-7f063bcece04" />
 # HTCE-Origin v1.0
 
 > **Q256 integer-only toroidal cognitive runtime with L1/L2/L3 state, proof-gated memory, bounded active-agent simulation, continual adaptive memory, and no-cross-domain regression probes.**
