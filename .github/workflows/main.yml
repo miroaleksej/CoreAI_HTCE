@@ -1,0 +1,5 @@
+python -m compileall htce_origin
+python scripts/scan_float_literals.py
+python scripts/check_invariants.py
+python scripts/run_v1_clean_system_revalidation.py
+python scripts/verify_manifest.py
