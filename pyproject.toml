@@ -10,6 +10,9 @@ testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
 
+[tool.setuptools]
+include-package-data = false
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["htce_origin", "htce_origin.*"]
