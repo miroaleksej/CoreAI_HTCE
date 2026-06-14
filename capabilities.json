@@ -41,5 +41,5 @@
     "protected_trace": true,
     "release_manifest_self_hash": true
   },
-  "version": "1.0.0-final_math-q256-clean"
+  "version": "1.0.0+final.math.q256.clean"
 }
