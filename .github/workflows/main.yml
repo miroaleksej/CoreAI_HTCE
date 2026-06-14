@@ -14,9 +14,6 @@ on:
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 jobs:
   verify:
     name: Verify HTCE-Origin v1.0
@@ -25,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -57,15 +54,16 @@ jobs:
         run: python scripts/00_gates/check_invariants.py
 
       - name: Run v1 clean system revalidation
-        run: python -c "from htce_origin import HTCERuntime; rt=HTCERuntime(); rt.wake(); r=rt.run_v1_clean_system_revalidation(stress_steps=8, grid_size=5).as_payload(); assert r['passed'] is True; print('v1_clean_system_revalidation: PASS')"
+        run: |
+          python -c "from htce_origin import HTCERuntime; rt=HTCERuntime(); rt.wake(); r=rt.run_v1_clean_system_revalidation(stress_steps=8, grid_size=5).as_payload(); assert r['passed'] is True; print('v1_clean_system_revalidation: PASS')"
 
-      - name: Verify release manifest
-        run: python scripts/05_artifacts/verify_manifest.py
-          if [ -f scripts/verify_trace.py ]; then
-            python scripts/verify_trace.py
+      - name: Verify protected trace
+        run: |
+          if [ -f scripts/05_artifacts/verify_trace.py ]; then
+            python scripts/05_artifacts/verify_trace.py
           else
-            echo "scripts/verify_trace.py not found; skipping trace standalone check"
+            echo "scripts/05_artifacts/verify_trace.py not found; skipping trace standalone check"
           fi
 
       - name: Verify release manifest
-        run: python scripts/verify_manifest.py
+        run: python scripts/05_artifacts/verify_manifest.py
