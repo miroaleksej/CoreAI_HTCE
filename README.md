@@ -598,7 +598,7 @@ $$
 proof authorization can be described as:
 
 $$
-\operatorname{Authorize}(\sigma) =
+\mathrm{Authorize}(\sigma) =
 \begin{cases}
 \texttt{ANSWER}, & \text{if proof valid and policy allows} \\
 \texttt{ASK\_CLARIFICATION}, & \text{if required data missing} \\
