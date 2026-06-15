@@ -1372,94 +1372,418 @@ That is the system’s core identity.
 
 ---
 
-### Abstract Mathematical Model of the HTCE-Origin Cognitive Runtime
+# Abstract Mathematical Model of the HTCE-Origin Cognitive Runtime
 
 *(This document describes the formal architecture while abstracting away proprietary implementation constants to protect core intellectual property.)*
 
 ## 1. Fundamental State Space
 
-The system operates within a discrete toroidal state space $\mathcal{S}$, defined as the direct product of rings of residues:
+The system operates within a discrete toroidal state space `S`, defined as the direct product of residue rings:
 
-$$
+```math
 \mathcal{S} = (\mathbb{Z}/N\mathbb{Z})^d
-$$
+```
 
 where:
 
--   $d$ is the fixed dimensionality of the space (guaranteeing $O(1)$ memory complexity).
--   $N$ is a large prime modulus (specifically, the secp256k1 scalar order $n$), ensuring cryptographic-grade collision resistance and preventing cyclic artifacts.
+* `d` is the fixed dimensionality of the space.
+* `N` is a large prime modulus. In the protected implementation profile, this modulus may be instantiated by the secp256k1 scalar order `n`, but this document intentionally abstracts implementation constants.
 
-Any system state at time $t$ is represented as a phase vector $\mathbf{h}_t \in \mathcal{S}$. The metric for distance between states is strictly defined as the shortest toroidal distance over true integer values without normalization:
+Any system state at time `t` is represented as a phase vector:
 
-$$
-d_{\mathbb{T}}(\mathbf{a}, \mathbf{b}) = \sum_{i=1}^{d} \min\left(|a_i - b_i|, \, N - |a_i - b_i|\right)
-$$
+```math
+\mathbf{h}_t \in \mathcal{S}
+```
 
-## 2. Hierarchical Memory Dynamics (L1/L2/L3)
+The metric for distance between states is defined as the shortest toroidal distance over true integer values, without floating-point normalization:
+
+```math
+d_{\mathbb{T}}(\mathbf{a}, \mathbf{b})
+=
+\sum_{i=1}^{d}
+\min\left(
+|a_i - b_i|,
+N - |a_i - b_i|
+\right)
+```
+
+## 2. Hierarchical Memory Dynamics: L1 / L2 / L3
 
 The architecture separates processing into three mathematically isolated circuits, linked by deterministic integer projections.
 
--   **L1: Sensory Encoding.** External discrete observations $\mathbf{x}_t$ are projected into the phase space using a sparse ternary matrix $\mathbf{W} \in \{-1, 0, 1\}^{d \times k}$:
+### 2.1. L1: Sensory Encoding
 
-    $$
-    \mathbf{u}_{obs} = \left( \mathbf{b} + \mathbf{W} \mathbf{x}_t \right) \bmod N
-    $$
+External discrete observations are projected into the toroidal phase space using a sparse ternary matrix:
 
-    The delta for body update is computed as $\Delta_{L1} = (\mathbf{u}_{obs} - \mathbf{h}_{L1}) \bmod N$.
+```math
+\mathbf{W} \in \{-1, 0, 1\}^{d \times k}
+```
 
--   **L2: Episodic Working Memory (Fact-as-Delta).** New facts are not stored as weights, but applied as phase shifts with an integer weight $w_f$ and an episodic tag $\tau_{ep}$:
+The observation phase is computed as:
 
-    $$
-    \mathbf{h}_{L2}(t+1) = \left( \mathbf{h}_{L2}(t) + w_f \cdot \delta_f + w_f \cdot \tau_{ep} \right) \bmod N
-    $$
+```math
+\mathbf{u}_{\mathrm{obs}}
+=
+\left(
+\mathbf{b}
++
+\mathbf{W}\mathbf{x}_t
+\right)
+\bmod N
+```
 
-    The system enforces a Supersession operator ($\oplus_{sup}$) for knowledge correction and a Quarantine operator ($\mathcal{Q}$). If a direct contradiction ($A$ and $\neg A$) is detected, the conflicting facts are moved to $\mathcal{Q}$, mathematically blocking them from any subsequent query resolution.
+The body-update delta is:
 
--   **L3: Semantic Consolidation.** During offline "sleep" cycles, L2 trajectories are compressed into sparse semantic rules via integer phase relaxation (analogous to Kuramoto synchronization). Note that $\eta \in \mathbb{Z}$ is an integer coupling strength, avoiding fractional thresholds:
+```math
+\Delta_{\mathrm{L1}}
+=
+\left(
+\mathbf{u}_{\mathrm{obs}}
+-
+\mathbf{h}_{\mathrm{L1}}
+\right)
+\bmod N
+```
 
-    $$
-    \theta_i(t+1) = \left( \theta_i(t) + \eta \sum_{j} \mathbf{K}_{ij} \operatorname{sin}_N(\theta_j - \theta_i) \right) \bmod N
-    $$
+### 2.2. L2: Episodic Working Memory / Fact-as-Delta
 
-    This ensures transitive inference ($A \rightarrow B, \, B \rightarrow C \Rightarrow A \rightarrow C$) without attention matrices, while a sparsity penalty prevents catastrophic forgetting.
+New facts are not stored as unconstrained neural weights. They are applied as phase shifts with an integer fact weight and an episodic tag:
+
+```math
+\mathbf{h}_{\mathrm{L2}}(t+1)
+=
+\left(
+\mathbf{h}_{\mathrm{L2}}(t)
++
+w_f \cdot \delta_f
++
+w_f \cdot \tau_{\mathrm{ep}}
+\right)
+\bmod N
+```
+
+where:
+
+* `w_f` is an integer evidence or confidence weight.
+* `\delta_f` is the toroidal phase delta induced by the fact.
+* `\tau_{\mathrm{ep}}` is the episodic tag binding the fact to its context.
+
+The system enforces a supersession operator and a quarantine operator:
+
+```math
+\oplus_{\mathrm{sup}}
+```
+
+```math
+\mathcal{Q}
+```
+
+If a direct contradiction, such as `A` and `not A`, is detected and cannot be resolved by supersession, the conflicting claims are moved into quarantine:
+
+```math
+A \land \neg A
+\Longrightarrow
+\{A, \neg A\} \subset \mathcal{Q}
+```
+
+Quarantined claims are mathematically excluded from authoritative query resolution unless later released by a verified evidence procedure.
+
+### 2.3. L3: Semantic Consolidation
+
+During offline consolidation cycles, L2 trajectories are compressed into sparse semantic rules via integer phase relaxation, analogous to discrete Kuramoto-style synchronization.
+
+The update rule is:
+
+```math
+\theta_i(t+1)
+=
+\left(
+\theta_i(t)
++
+\eta
+\sum_j
+\mathbf{K}_{ij}
+\operatorname{sin}_{N}
+\left(
+\theta_j - \theta_i
+\right)
+\right)
+\bmod N
+```
+
+where:
+
+* `\eta \in \mathbb{Z}` is an integer coupling strength.
+* `\mathbf{K}_{ij} \in \mathbb{Z}` is an integer coupling matrix.
+* `\operatorname{sin}_{N}` denotes a protected integer lookup or integer-safe approximation over the finite toroidal phase domain.
+
+This layer supports transitive semantic compression, for example:
+
+```math
+(A \rightarrow B)
+\land
+(B \rightarrow C)
+\Longrightarrow
+(A \rightarrow C)
+```
+
+However, L3 rules remain provisional. They cannot authorize an external answer or action without passing through the theorem layer, evidence gate, and policy gate.
 
 ## 3. Active Inference and Decision Making
 
-Action selection $\pi$ is performed by minimizing the **Raw Integer Expected Free Energy (Raw EFE)**. Crucially, the system never uses floating-point normalization in the decision path:
+Action selection is performed by minimizing Raw Integer Expected Free Energy, abbreviated as Raw EFE. The decision path does not use floating-point normalization.
 
-$$
-G_{raw}(\pi) = \mathcal{R}_{raw} + \mathcal{U}_{raw} + \mathcal{C}_{raw} - \mathcal{N}_{raw} - \mathcal{P}_{raw}
-$$
+```math
+G_{\mathrm{raw}}(\pi)
+=
+\mathcal{R}_{\mathrm{raw}}
++
+\mathcal{U}_{\mathrm{raw}}
++
+\mathcal{C}_{\mathrm{raw}}
+-
+\mathcal{N}_{\mathrm{raw}}
+-
+\mathcal{P}_{\mathrm{raw}}
+```
 
-where $\mathcal{R}$ is risk, $\mathcal{U}$ is uncertainty, $\mathcal{C}$ is complexity, $\mathcal{N}$ is novelty, and $\mathcal{P}$ is goal progress. All terms are unnormalized integers in $\mathbb{Z}$. The optimal policy is chosen deterministically:
+where:
 
-$$
-\pi^* = \operatorname*{argmin}_{\pi} G_{raw}(\pi)
-$$
+* `\mathcal{R}_{\mathrm{raw}}` is raw integer risk.
+* `\mathcal{U}_{\mathrm{raw}}` is raw integer uncertainty.
+* `\mathcal{C}_{\mathrm{raw}}` is raw integer complexity.
+* `\mathcal{N}_{\mathrm{raw}}` is raw integer novelty.
+* `\mathcal{P}_{\mathrm{raw}}` is raw integer goal progress.
+
+All terms are unnormalized integers:
+
+```math
+\mathcal{R}_{\mathrm{raw}},
+\mathcal{U}_{\mathrm{raw}},
+\mathcal{C}_{\mathrm{raw}},
+\mathcal{N}_{\mathrm{raw}},
+\mathcal{P}_{\mathrm{raw}}
+\in
+\mathbb{Z}
+```
+
+The optimal policy is chosen deterministically:
+
+```math
+\pi^*
+=
+\operatorname*{arg\,min}_{\pi}
+G_{\mathrm{raw}}(\pi)
+```
 
 ## 4. Topological Integrity and Gating
 
-To guarantee the absence of hallucinations and memory degradation, the system computes persistent homology invariants for a sliding window of states $\mathcal{W}_t$ in real-time. A Vietoris-Rips 1-skeleton $\mathcal{VR}_\epsilon(\mathcal{W}_t)$ is constructed using the true toroidal metric $d_{\mathbb{T}}$, and Betti numbers ($\beta_0, \beta_1 \in \mathbb{Z}_{\ge 0}$) are evaluated.
+To reduce hallucination risk and detect memory degradation, the system evaluates persistent topological invariants over a sliding window of states:
 
-> **Topological Gate Theorem:** If the computed integer invariants $(\beta_0, \beta_1)$ deviate beyond a calibrated confidence interval $[\beta_{min}, \beta_{max}] \subset \mathbb{Z}^2$, the transition function $T(\mathbf{h}_t, \pi)$ is forcibly mapped to a `REFUSE` or `ASK_CLARIFICATION` state, making the issuance of a hallucinated response mathematically impossible.
+```math
+\mathcal{W}_t
+=
+\{
+\mathbf{h}_{t-m},
+\ldots,
+\mathbf{h}_{t}
+\}
+```
 
-## 5. Cryptographic Auditability (Protected Trace)
+A Vietoris-Rips 1-skeleton is constructed using the true toroidal metric:
+
+```math
+\mathcal{VR}_{\epsilon}(\mathcal{W}_t, d_{\mathbb{T}})
+```
+
+The monitored Betti numbers are:
+
+```math
+\beta_0, \beta_1 \in \mathbb{Z}_{\ge 0}
+```
+
+### Topological Gate Theorem
+
+If the computed integer invariants deviate outside the calibrated safe region:
+
+```math
+(\beta_0, \beta_1)
+\notin
+\mathcal{B}_{\mathrm{safe}}
+\subset
+\mathbb{Z}_{\ge 0}^{2}
+```
+
+then the transition function is blocked from producing an authoritative answer:
+
+```math
+T(\mathbf{h}_t, \pi)
+\longrightarrow
+\mathrm{REFUSE}
+\quad
+\mathrm{or}
+\quad
+\mathrm{ASK\_CLARIFICATION}
+```
+
+This does not claim universal omniscience. It means that under the stated invariant checks, a topologically invalid or insufficiently grounded transition cannot pass as an authorized answer.
+
+## 5. Cryptographic Auditability: Protected Trace
 
 Every system tick generates an event appended to an immutable hash chain:
 
-$$
-H_t = \operatorname{SHA256}\Big( H_{t-1} \,\|\, \operatorname{Canon}\big(\Delta_t, \, \pi^*_t, \, \operatorname{Gate}_t, \, G_{raw}(\pi^*_t)\big) \Big)
-$$
+```math
+H_t
+=
+\operatorname{SHA256}
+\left(
+H_{t-1}
+\,
+\Vert
+\,
+\operatorname{Canon}
+\left(
+\Delta_t,
+\pi_t^*,
+\operatorname{Gate}_t,
+G_{\mathrm{raw}}(\pi_t^*)
+\right)
+\right)
+```
 
-where $\operatorname{Canon}(\cdot)$ is a strict, float-rejecting canonical JSON serialization. This guarantees that any decision can be retrospectively verified against the system's mathematical invariants.
+where `\operatorname{Canon}(\cdot)` is a strict canonical JSON serialization procedure that rejects floating-point values in the protected decision path.
 
-## 6. Formal Guarantees (Invariants)
+This guarantees that each decision can be retrospectively verified against the recorded deltas, selected policy, gate state, and raw integer decision score.
 
-The architecture is provably bound by the following machine-checkable invariants:
+## 6. Formal Guarantees: Machine-Checkable Invariants
 
-1.  **Zero-Float Invariant:** For all operations in the decision path, data types belong to the set $\{\mathbb{Z}, \text{String}, \text{Bool}\}$. No $\mathbb{Q}$ or $\mathbb{R}$ types are permitted.
-2.  **L3 Non-Authority Invariant:** Rules generated in L3 hold a `provisional` status and cannot authorize an answer or action without passing through the Theorem Layer.
-3.  **No-Regression Invariant:** The $\text{L2} \rightarrow \text{L3}$ consolidation monotonically decreases the total integer loss function $\mathcal{L}_{total}$ without overwriting orthogonal, previously learned patterns.
+The architecture is bound by the following machine-checkable invariants.
+
+### 6.1. Zero-Float Invariant
+
+For all operations in the protected decision path, admissible runtime values belong to:
+
+```math
+\{
+\mathbb{Z},
+\mathrm{String},
+\mathrm{Bool}
+\}
+```
+
+No rational or real-valued runtime types are permitted in the protected decision path:
+
+```math
+\mathbb{Q}, \mathbb{R}
+\notin
+\mathrm{DecisionPathTypes}
+```
+
+### 6.2. L3 Non-Authority Invariant
+
+Rules generated in L3 hold provisional status:
+
+```math
+\mathrm{status}(r_{\mathrm{L3}})
+=
+\mathrm{provisional}
+```
+
+A provisional L3 rule cannot authorize an answer or action unless it passes through the theorem layer, evidence gate, and policy gate:
+
+```math
+r_{\mathrm{L3}}
+\not\Rightarrow
+\mathrm{AUTHORIZED\_ANSWER}
+```
+
+unless:
+
+```math
+\operatorname{TheoremPass}(r_{\mathrm{L3}})
+\land
+\operatorname{EvidencePass}(r_{\mathrm{L3}})
+\land
+\operatorname{PolicyPass}(r_{\mathrm{L3}})
+```
+
+### 6.3. No-Regression Invariant
+
+For accepted consolidation steps, the L2-to-L3 consolidation must not increase the protected integer loss:
+
+```math
+\mathcal{L}_{\mathrm{total}}(t+1)
+\le
+\mathcal{L}_{\mathrm{total}}(t)
+```
+
+If this condition fails, the consolidation step is rejected or quarantined:
+
+```math
+\mathcal{L}_{\mathrm{total}}(t+1)
+>
+\mathcal{L}_{\mathrm{total}}(t)
+\Longrightarrow
+\mathrm{REJECT}
+\quad
+\mathrm{or}
+\quad
+\mathcal{Q}
+```
+
+### 6.4. Protected Trace Invariant
+
+For every accepted transition, the trace hash must satisfy:
+
+```math
+H_t
+=
+\operatorname{SHA256}
+\left(
+H_{t-1}
+\Vert
+\operatorname{Canon}(E_t)
+\right)
+```
+
+where `E_t` is the canonical event payload for tick `t`.
+
+Any mismatch breaks verification:
+
+```math
+H_t
+\ne
+\operatorname{SHA256}
+\left(
+H_{t-1}
+\Vert
+\operatorname{Canon}(E_t)
+\right)
+\Longrightarrow
+\mathrm{TRACE\_INVALID}
+```
+
+### 6.5. Quarantine Non-Authority Invariant
+
+A quarantined claim cannot be used as support for an authoritative answer:
+
+```math
+c \in \mathcal{Q}
+\Longrightarrow
+c
+\notin
+\operatorname{SupportSet}
+(
+\mathrm{AUTHORIZED\_ANSWER}
+)
+```
+
+## 7. Summary
+
+HTCE-Origin is a bounded, integer-only, toroidal cognitive runtime. Its active state is represented as a phase vector over a finite toroidal space; its memory is organized through L1 sensory encoding, L2 fact-as-delta episodic memory, and L3 provisional semantic consolidation.
+
+The architecture does not rely on floating-point hidden activations in the protected decision path. Instead, it combines integer toroidal dynamics, evidence-gated memory, topological integrity checks, and cryptographic traceability to produce auditable, refusal-capable cognitive behavior.
+l}$ without overwriting orthogonal, previously learned patterns.
 4.  **Simulation-Only Invariant:** For all actions, the flag $\text{real\_action\_allowed} \equiv \text{False}$ at the kernel level.
 
 ---
