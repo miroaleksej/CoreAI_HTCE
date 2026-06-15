@@ -1383,7 +1383,9 @@ where:
 *   $N$ is a large prime modulus (specifically, the secp256k1 scalar order $n$), ensuring cryptographic-grade collision resistance and preventing cyclic artifacts.
 
 Any system state at time $t$ is represented as a phase vector $\mathbf{h}_t \in \mathcal{S}$. The metric for distance between states is strictly defined as the shortest toroidal distance:
-$$ d_{\mathbb{T}}(\mathbf{a}, \mathbf{b}) = \sum_{i=1}^{d} \min(|a_i - b_i|, N - |a_i - b_i|) $$
+$$ 
+d_{\mathbb{T}}(\mathbf{a}, \mathbf{b}) = \sum_{i=1}^{d} \min(|a_i - b_i|, N - |a_i - b_i|) 
+$$
 
 #### **2. Hierarchical Memory Dynamics (L1/L2/L3)**
 The architecture separates processing into three mathematically isolated circuits, linked by deterministic integer projections.
