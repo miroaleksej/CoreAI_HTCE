@@ -1,7 +1,9 @@
 <img width="1447" height="1087" alt="9a2927df-694b-4fe9-af63-c317eefe3039" src="https://github.com/user-attachments/assets/e8d3c161-6366-4b01-9548-7f063bcece04" />
 
-![arXiv](https://img.shields.io/badge/arXiv-24xx.xxxxx-b31b1b.svg)
-![Acceptance](https://img.shields.io/badge/Invariants-19/19%20PASS-brightgreen)
+<p align="center">
+  ![arXiv](https://img.shields.io/badge/arXiv-24xx.xxxxx-b31b1b.svg)
+  ![Acceptance](https://img.shields.io/badge/Invariants-19/19%20PASS-brightgreen)
+</p>
 
 # HTCE-Origin v1.0
 
