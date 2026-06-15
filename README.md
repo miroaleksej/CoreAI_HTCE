@@ -295,7 +295,7 @@ This is one of the core anti-hallucination principles of the runtime.
 The trace is a hash-linked sequence of events:
 
 $$
-h_t = H(h_{t-1} \parallel \operatorname{canonical\_json}(event_t))
+h_t = H(h_{t-1} \parallel \mathrm{canonical\_json}(event_t))
 $$
 
 where:
