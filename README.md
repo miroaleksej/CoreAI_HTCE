@@ -193,13 +193,13 @@ The decision path is integer-only. Human-readable percentages or basis points ma
 For one coordinate, the circular distance is:
 
 $$
-\operatorname{dist}_N(a,b) = \min\left(|a-b|,\; N - |a-b|\right)
+\mathrm{dist}_N(a,b) = \min\left(|a-b|,\; N - |a-b|\right)
 $$
 
 For a vector state:
 
 $$
-D_N(\mathbf{x},\mathbf{y}) = \sum_{i=1}^{d} \operatorname{dist}_N(x_i,y_i)
+D_N(\mathbf{x},\mathbf{y}) = \sum_{i=1}^{d} \mathrm{dist}_N(x_i,y_i)
 $$
 
 This gives the runtime a native topology-aware notion of change: large modular jumps can be detected as anomalous even if the raw representation wraps around.
