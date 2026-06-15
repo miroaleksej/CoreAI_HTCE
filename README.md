@@ -1465,8 +1465,8 @@ w_f \cdot \tau_{\mathrm{ep}}
 where:
 
 * `w_f` is an integer evidence or confidence weight.
-* `\delta_f` is the toroidal phase delta induced by the fact.
-* `\tau_{\mathrm{ep}}` is the episodic tag binding the fact to its context.
+* `delta_f` is the toroidal phase delta induced by the fact.
+* `tau_ep` is the episodic tag binding the fact to its context.
 
 The system enforces a supersession operator and a quarantine operator:
 
@@ -1503,7 +1503,7 @@ The update rule is:
 \eta
 \sum_j
 \mathbf{K}_{ij}
-\operatorname{sin}_{N}
+\sin_N
 \left(
 \theta_j - \theta_i
 \right)
@@ -1513,9 +1513,19 @@ The update rule is:
 
 where:
 
-* `\eta \in \mathbb{Z}` is an integer coupling strength.
-* `\mathbf{K}_{ij} \in \mathbb{Z}` is an integer coupling matrix.
-* `\operatorname{sin}_{N}` denotes a protected integer lookup or integer-safe approximation over the finite toroidal phase domain.
+* `eta` is an integer coupling strength.
+* `K_ij` is an integer coupling matrix.
+* `sin_N` denotes a protected integer lookup or integer-safe approximation over the finite toroidal phase domain.
+
+In formal notation:
+
+```math
+\eta \in \mathbb{Z}
+```
+
+```math
+\mathbf{K}_{ij} \in \mathbb{Z}
+```
 
 This layer supports transitive semantic compression, for example:
 
@@ -1549,11 +1559,11 @@ G_{\mathrm{raw}}(\pi)
 
 where:
 
-* `\mathcal{R}_{\mathrm{raw}}` is raw integer risk.
-* `\mathcal{U}_{\mathrm{raw}}` is raw integer uncertainty.
-* `\mathcal{C}_{\mathrm{raw}}` is raw integer complexity.
-* `\mathcal{N}_{\mathrm{raw}}` is raw integer novelty.
-* `\mathcal{P}_{\mathrm{raw}}` is raw integer goal progress.
+* `R_raw` is raw integer risk.
+* `U_raw` is raw integer uncertainty.
+* `C_raw` is raw integer complexity.
+* `N_raw` is raw integer novelty.
+* `P_raw` is raw integer goal progress.
 
 All terms are unnormalized integers:
 
@@ -1572,7 +1582,7 @@ The optimal policy is chosen deterministically:
 ```math
 \pi^*
 =
-\operatorname*{arg\,min}_{\pi}
+\arg\min_{\pi}
 G_{\mathrm{raw}}(\pi)
 ```
 
@@ -1635,23 +1645,23 @@ Every system tick generates an event appended to an immutable hash chain:
 ```math
 H_t
 =
-\operatorname{SHA256}
+\mathrm{SHA256}
 \left(
 H_{t-1}
 \,
 \Vert
 \,
-\operatorname{Canon}
+\mathrm{Canon}
 \left(
 \Delta_t,
 \pi_t^*,
-\operatorname{Gate}_t,
+\mathrm{Gate}_t,
 G_{\mathrm{raw}}(\pi_t^*)
 \right)
 \right)
 ```
 
-where `\operatorname{Canon}(\cdot)` is a strict canonical JSON serialization procedure that rejects floating-point values in the protected decision path.
+where `Canon(...)` is a strict canonical JSON serialization procedure that rejects floating-point values in the protected decision path.
 
 This guarantees that each decision can be retrospectively verified against the recorded deltas, selected policy, gate state, and raw integer decision score.
 
@@ -1697,14 +1707,14 @@ r_{\mathrm{L3}}
 \mathrm{AUTHORIZED\_ANSWER}
 ```
 
-unless:
+unless all authorization gates pass:
 
 ```math
-\operatorname{TheoremPass}(r_{\mathrm{L3}})
+\mathrm{TheoremPass}(r_{\mathrm{L3}})
 \land
-\operatorname{EvidencePass}(r_{\mathrm{L3}})
+\mathrm{EvidencePass}(r_{\mathrm{L3}})
 \land
-\operatorname{PolicyPass}(r_{\mathrm{L3}})
+\mathrm{PolicyPass}(r_{\mathrm{L3}})
 ```
 
 ### 6.3. No-Regression Invariant
@@ -1738,11 +1748,11 @@ For every accepted transition, the trace hash must satisfy:
 ```math
 H_t
 =
-\operatorname{SHA256}
+\mathrm{SHA256}
 \left(
 H_{t-1}
 \Vert
-\operatorname{Canon}(E_t)
+\mathrm{Canon}(E_t)
 \right)
 ```
 
@@ -1753,11 +1763,11 @@ Any mismatch breaks verification:
 ```math
 H_t
 \ne
-\operatorname{SHA256}
+\mathrm{SHA256}
 \left(
 H_{t-1}
 \Vert
-\operatorname{Canon}(E_t)
+\mathrm{Canon}(E_t)
 \right)
 \Longrightarrow
 \mathrm{TRACE\_INVALID}
@@ -1772,7 +1782,7 @@ c \in \mathcal{Q}
 \Longrightarrow
 c
 \notin
-\operatorname{SupportSet}
+\mathrm{SupportSet}
 (
 \mathrm{AUTHORIZED\_ANSWER}
 )
@@ -1783,7 +1793,3 @@ c
 HTCE-Origin is a bounded, integer-only, toroidal cognitive runtime. Its active state is represented as a phase vector over a finite toroidal space; its memory is organized through L1 sensory encoding, L2 fact-as-delta episodic memory, and L3 provisional semantic consolidation.
 
 The architecture does not rely on floating-point hidden activations in the protected decision path. Instead, it combines integer toroidal dynamics, evidence-gated memory, topological integrity checks, and cryptographic traceability to produce auditable, refusal-capable cognitive behavior.
-l}$ without overwriting orthogonal, previously learned patterns.
-4.  **Simulation-Only Invariant:** For all actions, the flag $\text{real\_action\_allowed} \equiv \text{False}$ at the kernel level.
-
----
