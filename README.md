@@ -1394,16 +1394,16 @@ $$ d_{\mathbb{T}}(\mathbf{a}, \mathbf{b}) = \sum_{i=1}^{d} \min(|a_i - b_i|, N -
 ## 2. Hierarchical Memory Dynamics (L1/L2/L3)
 The architecture separates processing into three mathematically isolated circuits, linked by deterministic integer projections.
 
-* **L1: Sensory Encoding.** External discrete observations $\mathbf{x}_t$ are projected into the phase space using a sparse ternary matrix $\mathbf{W} \in \{-1, 0, 1\}^{d \times k}$:
-  $$ \mathbf{u}_{obs} = \left( \mathbf{b} + \mathbf{W} \mathbf{x}_t \right) \pmod N $$
+* **L1: Sensory Encoding.** External discrete observations $\mathbf{x}_t$ are projected into the phase space using a sparse ternary matrix $ mathbf{W} \in \{-1, 0, 1\}^{d \times k} $ :
+  $$ mathbf{u}_{obs} = \left( \mathbf{b} + \mathbf{W} \mathbf{x}_t \right) \pmod N $$
   The delta for body update is computed as $\Delta_{L1} = (\mathbf{u}_{obs} - \mathbf{h}_{L1}) \pmod N$.
 
 * **L2: Episodic Working Memory (Fact-as-Delta).** New facts are not stored as weights, but applied as phase shifts with a weight $w_f$ and an episodic tag $\tau_{ep}$:
-  $$ \mathbf{h}_{L2}(t+1) = \left( \mathbf{h}_{L2}(t) + w_f \cdot \delta_f + w_f \cdot \tau_{ep} \right) \pmod N $$
+  $$ mathbf{h}_{L2}(t+1) = \left( \mathbf{h}_{L2}(t) + w_f \cdot \delta_f + w_f \cdot \tau_{ep} \right) \pmod N $$
   The system enforces a Supersession operator ($\oplus_{sup}$) for knowledge correction and a Quarantine operator ($\mathcal{Q}$). If a direct contradiction ($A$ and $\neg A$) is detected, the conflicting facts are moved to $\mathcal{Q}$, mathematically blocking them from any subsequent query resolution.
 
 * **L3: Semantic Consolidation.** During offline "sleep" cycles, L2 trajectories are compressed into sparse semantic rules via integer phase relaxation (analogous to Kuramoto synchronization):
-  $$ \theta_i(t+1) = \left( \theta_i(t) + \eta \sum_{j} \mathbf{K}_{ij} \sin_N(\theta_j - \theta_i) \right) \pmod N $$
+  $$ theta_i(t+1) = \left( \theta_i(t) + \eta \sum_{j} \mathbf{K}_{ij} \sin_N(\theta_j - \theta_i) \right) \pmod N $$
   This ensures transitive inference ($A \rightarrow B, B \rightarrow C \Rightarrow A \rightarrow C$) without attention matrices, while a sparsity penalty prevents catastrophic forgetting.
 
 ---
