@@ -1372,6 +1372,9 @@ That is the system’s core identity.
 
 ---
 
+<img width="1054" height="1492" alt="ChatGPT Image 15 июн  2026 г , 11_59_42" src="https://github.com/user-attachments/assets/f8f5b694-129b-41c9-9c58-9f9ab2fd9e4e" />
+
+
 # Abstract Mathematical Model of the HTCE-Origin Cognitive Runtime
 
 *(This document describes the formal architecture while abstracting away proprietary implementation constants to protect core intellectual property.)*
